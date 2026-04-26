@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国古代书画家知识图谱</title>
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+    <!-- 封面 -->
+    <div id="cover" class="cover">
+        <div class="cover-content">
+            <h1>书画知识图谱</h1>
+            <p>探索中国古代书画家的艺术世界</p>
+            <button id="enter-btn">进入</button>
+        </div>
+    </div>
+    
+    <!-- 百度风格首页 -->
+    <div id="landing-page" class="landing-page">
+        <div class="landing-content">
+            <h1 class="landing-title">墨谱-书画知识图谱</h1>
+            <div class="landing-tabs">
+                <button class="landing-tab active" data-type="calligrapher">书画家</button>
+                <button class="landing-tab" data-type="character">汉字</button>
+                <button class="landing-tab" data-type="upload">单字流派识别</button>
+            </div>
+            <div class="landing-search-group">
+                <input type="text" id="landing-search-input" placeholder="输入书画家姓名..." autocomplete="off" spellcheck="false">
+                <button id="landing-search-btn" title="搜索">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="landing-search-history" class="search-history-box"></div>
+            <input type="file" id="landing-upload" name="image" accept="image/*" style="display: none;">
+        </div>
+    </div>
+    
+    <div id="app">
+        <header>
+            <div class="logo">
+                <h1>墨谱-书画知识图谱</h1>
+            </div>
+            
+            <div class="controls">
+                <div class="search-group">
+                    <!-- 搜索类型切换 -->
+                    <div class="search-type-toggle">
+                        <button class="search-type-btn active" data-type="calligrapher" title="搜索书法家">书画家</button>
+                        <button class="search-type-btn" data-type="character" title="搜索字">汉字</button>
+                        <button class="search-type-btn" data-type="upload" title="上传图片识别流派">单字流派识别</button>
+                    </div>
+                    
+                    <!-- 搜索输入框和按钮 -->
+                    <div class="search-input-group">
+                        <input type="text" id="search-input" placeholder="输入书画家姓名..." autocomplete="off" spellcheck="false">
+                        <button id="search-btn" title="搜索">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+                            </svg>
+                        </button>
+                        <button id="upload-btn" class="upload-btn" title="上传图片识别流派">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5-7v-2h-3v-3h-2v3H7v2h3v3h2v-3h3z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- 隐藏的文件上传输入 -->
+                    <input type="file" id="ai-upload" name="image" accept="image/*" style="display: none;">
+                </div>
+            </div>
+        </header>
+
+        <div id="app-search-history" class="search-history-box"></div>
+
+        <main>
+            <div id="graph-container"></div>
+
+            <aside id="info-panel" class="hidden">
+                <div class="panel-header">
+                    <h2 id="p-name">姓名加载中...</h2>
+                    <button id="close-panel" title="关闭">&times;</button>
+                </div>
+                <div id="p-content">
+                    <div class="img-wrapper">
+                        <img id="p-img" src="" alt="作品示例图">
+                    </div>
+                    <div class="info-content">
+                        <div id="p-desc" class="description"></div>
+                        <div id="p-all-probs" class="all-probabilities"></div>
+                    </div>
+                </div>
+            </aside>
+            
+            <!-- AI识别面板 -->
+            <aside id="ai-panel" class="hidden">
+                <div class="panel-header">
+                    <h2 id="ai-name">AI 识别详情</h2>
+                </div>
+                <div id="ai-content">
+                    <div class="img-wrapper">
+                        <img id="ai-img" src="" alt="识别图片">
+                    </div>
+                    <div class="info-content">
+                        <div id="ai-desc" class="description"></div>
+                        <div id="ai-all-probs" class="all-probabilities"></div>
+                    </div>
+                </div>
+            </aside>
+
+            <div id="character-panel" class="hidden">
+                <div class="panel-header">
+                    <h2 id="c-name">汉字书法作品</h2>
+                    <div class="panel-controls">
+                        <button id="fullscreen-character-panel" title="全屏">⛶</button>
+                        <button id="close-character-panel" title="关闭">&times;</button>
+                    </div>
+                </div>
+                <div class="character-display">
+                    <span id="c-character"></span>
+                </div>
+                <div class="character-images" id="c-images">
+                </div>
+                <!-- 底部关闭按钮 -->
+                <div class="panel-footer">
+                    <button id="bottom-close-character-panel" class="btn-close-bottom">关闭面板</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 节点详情模态框 -->
+    <div id="node-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title"></h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- 节点详情将在这里动态添加 -->
+            </div>
+            <div class="modal-footer">
+                <button id="close-modal" class="btn btn-primary">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="main.js?v=1.0.1"></script>
+</body>
+</html>
